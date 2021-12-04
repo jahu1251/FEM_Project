@@ -5,12 +5,12 @@ from Matrix_Integration import Matrix_Integration
 
 
 def main():
-    simulate(5, 5, 0.1, 0.1, 2, 25, 1200)
+    simulate(4, 4, 0.1, 0.1, 2, 25, 1200, 700, 7800, 300, 50, 100)
 
 
-def simulate(nH, nB, H, B, integ_points_num, cond, temp):
+def simulate(nH, nB, H, B, integ_points_num, cond, temp, c, ro, alfa, time_step, init_temp):
     print("================ Siatka ================")
-    grid_obj = Grid(nH, nB, H, B, temp)
+    grid_obj = Grid(nH, nB, H, B, temp, time_step, init_temp)
     grid_obj.print_grid()
 
     # print("================ Całkowanie Gauss'a ================")
@@ -22,7 +22,7 @@ def simulate(nH, nB, H, B, integ_points_num, cond, temp):
 
     print("================ Pochodne ================")
 
-    universal_element_obj = Element4_2D(cond, integ_points_num)
+    universal_element_obj = Element4_2D(cond, integ_points_num, c, ro)
     if integ_points_num == 2:
         universal_element_obj.calculate_2()
         universal_element_obj.calculate_temp_matrix_for_hbc_2()
@@ -34,12 +34,16 @@ def simulate(nH, nB, H, B, integ_points_num, cond, temp):
     jacobian_obj = Jacobian(universal_element_obj.derivativeKsi, universal_element_obj.derivativeEta, grid_obj.elements)
 
     print("================ Macierz ================")
-    matrix_integration_obj = Matrix_Integration(universal_element_obj.derivativeKsi, universal_element_obj.derivativeEta, jacobian_obj.calculate_grid_jacobians(), cond)
+    matrix_integration_obj = Matrix_Integration(universal_element_obj.derivativeKsi, universal_element_obj.derivativeEta, jacobian_obj.calculate_grid_jacobians(), cond, c, ro , universal_element_obj.N_values)
     matrix_integration_obj.calculate_H_matrixes_for_grid()
 
     grid_obj.add_h_matrixes_to_elements(matrix_integration_obj.global_h_matrix_list)
-    grid_obj.calculate_hbc_matrixes_for_elements(universal_element_obj.temp_matrix_for_hbc, cond)
+    grid_obj.add_c_matrixes_to_elements(matrix_integration_obj.global_c_matrix_list)
 
+    if integ_points_num == 2:
+        grid_obj.calculate_hbc_matrixes_for_elements(universal_element_obj.temp_matrix_for_hbc, alfa)
+    elif integ_points_num == 3:
+        grid_obj.calculate_hbc_matrixes_for_elements_3(universal_element_obj.temp_matrix_for_hbc, alfa)
     grid_obj.aggregation()
 
 if __name__ == "__main__":

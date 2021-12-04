@@ -13,5 +13,6 @@ class Element:
         self.nodes.append(node3)
         self.nodes.append(node4)
         self.h_matrix = np.zeros((4, 4))
+        self.c_matrix = np.zeros((4, 4))
         self.hbc_matrix = np.zeros((4, 4))
         self.p_vect = np.zeros((4))

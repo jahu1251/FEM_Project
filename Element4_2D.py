@@ -71,9 +71,13 @@ class Element4_2D:
 
     p_vect = np.zeros((4,4))
 
+    N_values = np.zeros((4, 4))
+    N_values_3 = np.zeros((4, 9))
 
-    def __init__(self, cond, integ_points):
+    def __init__(self, cond, integ_points, c, ro):
         self.cond = cond
+        self.ro = ro
+        self.c = c
 
         if integ_points == 2:
             self.temp_matrix_for_hbc = np.zeros((4, 2, 4))
@@ -87,6 +91,9 @@ class Element4_2D:
         return final
 
     def calculate_2(self):
+        for i in range(4):
+            for j in range(4):
+                self.N_values[i, j] = self.functions_hbc[i](self.Ksi_2[j], self.Eta_2[j])
 
         output = []
         for i in self.functions:
@@ -117,6 +124,10 @@ class Element4_2D:
             print(i)
 
     def calculate_3(self):
+
+        for i in range(4):
+            for j in range(9):
+                self.N_values_3[i, j] = self.functions_hbc[j](self.Ksi_3[i][j], self.Eta_3[i][j])
 
         output = []
         for i in self.functions:
@@ -165,12 +176,3 @@ class Element4_2D:
                     self.temp_matrix_for_hbc[i, k, j] = self.functions_hbc[j](self.Ksi_wall_points_3_list[i][k], self.Eta_wall_points_3_list[i][k])
             print("element ", i)
             print(self.temp_matrix_for_hbc[i])
-
-        #     if i == 0 or i == 2:
-        #         self.walls_hbc[i] = self.cond*(np.outer(temp_matrix[0], temp_matrix[0].transpose()) + np.outer(temp_matrix[1], temp_matrix[1].transpose()))*self.detJ_x
-        #     elif i == 1 or i == 3:
-        #         self.walls_hbc[i] = self.cond*(np.outer(temp_matrix[0], temp_matrix[0].transpose()) + np.outer(temp_matrix[1], temp_matrix[1].transpose())) * self.detJ_y
-        #
-        #     print(self.walls_hbc[i])
-        #
-        # return self.walls_hbc

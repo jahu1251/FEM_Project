@@ -2,12 +2,15 @@ import numpy as np
 
 class Matrix_Integration:
 
-    def __init__(self, ksi_der, eta_der, jacobian_matrix_list, cond):
+    def __init__(self, ksi_der, eta_der, jacobian_matrix_list, cond, c, ro, N_values):
 
         self.ksi_derivatives = ksi_der
         self.eta_derivatives = eta_der
         self.jacobian_matrix_list = jacobian_matrix_list
         self.cond = cond
+        self.ro = ro
+        self.c = c
+        self.N_values = N_values
 
     def calculate_temp_table_dx(self):
 
@@ -36,7 +39,7 @@ class Matrix_Integration:
 
         return dy_tab
 
-    def calculate_matrix_for_element(self, dx_tab, dy_tab, jacobian):
+    def calculate_matrix_h_for_element(self, dx_tab, dy_tab, jacobian):
 
         y = 1/np.linalg.det(jacobian)
 
@@ -65,16 +68,46 @@ class Matrix_Integration:
 
         return H
 
+    def calculate_matrix_c_for_element(self, jacobian):
+
+        det_J = 1/np.linalg.det(jacobian)
+
+        C_pc1 = np.zeros((4, 4))
+        C_pc2 = np.zeros((4, 4))
+        C_pc3 = np.zeros((4, 4))
+        C_pc4 = np.zeros((4, 4))
+        C_pc_list = [C_pc1, C_pc2, C_pc3, C_pc4]
+
+        for i in range(4):
+            temp_N_Values = np.matrix(self.N_values[i])
+            C_pc_list[i] = self.c * self.ro * (np.outer(temp_N_Values, temp_N_Values.transpose())) * det_J
+
+        z = 1
+        for x in C_pc_list:
+            print("[C]Pc", z)
+            z = z + 1
+            print(np.round(x, 2))
+
+        print("Macierz C: ")
+        C = C_pc_list[0] + C_pc_list[1] + C_pc_list[2] + C_pc_list[3]
+        print(np.round(C, 2))
+
+        return C
+
     def calculate_H_matrixes_for_grid(self):
 
         global_h_matrix_list = np.zeros((len(self.jacobian_matrix_list), 4, 4))
+        global_c_matrix_list = np.zeros((len(self.jacobian_matrix_list), 4, 4))
 
         for i in range(len(self.jacobian_matrix_list)):
 
             print("=========================== element", i, "=================================")
             temp_dx_table = self.calculate_temp_table_dx()
             temp_dy_table = self.calculate_temp_table_dy()
-            global_h_matrix_list[i] = self.calculate_matrix_for_element(temp_dx_table, temp_dy_table, self.jacobian_matrix_list[i])
+            global_h_matrix_list[i] = self.calculate_matrix_h_for_element(temp_dx_table, temp_dy_table, self.jacobian_matrix_list[i])
+            global_c_matrix_list[i] = self.calculate_matrix_c_for_element(self.jacobian_matrix_list[i])
             print(global_h_matrix_list[i])
+            print(global_c_matrix_list[i])
 
         self.global_h_matrix_list = global_h_matrix_list
+        self.global_c_matrix_list = global_c_matrix_list
