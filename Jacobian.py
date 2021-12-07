@@ -47,20 +47,19 @@ class Jacobian:
     def calc_jacobian_rigid(self):
 
         for i in range(len(self.auxiliary_matrix_list)):
-            print()
             self.auxiliary_matrix_list[i][0][0] = self.calculate_matrix_cell_rigid(self.eta_derivatives[i], self.rigid_values[1])
             self.auxiliary_matrix_list[i][1][1] = self.calculate_matrix_cell_rigid(self.ksi_derivatives[i], self.rigid_values[0])
 
         j = 0
         for i in self.auxiliary_matrix_list:
-            print(i)
+            # print(i)
             determinant = 1/np.linalg.det(i)
             self.jacobian_matrix_list[j] = i * determinant
             j = j + 1
-
-        print("Pochodne po x i pochodne po y dla sztynego przykladu :")
-        for i in self.jacobian_matrix_list:
-            print(i)
+        #
+        # print("Pochodne po x i pochodne po y dla sztynego przykladu :")
+        # for i in self.jacobian_matrix_list:
+        #     print(i)
 
         return self.jacobian_matrix_list
 
@@ -88,8 +87,8 @@ class Jacobian:
         for i in self.elements:
             jacobian_result.append(self.calc_jacobian(i.nodes))
 
-        for i in jacobian_result:
-            print(i)
+        # for i in jacobian_result:
+        #     print(i)
 
         return jacobian_result
 

@@ -109,9 +109,9 @@ class Element4_2D:
         for i in self.functions2:
             output2.append(self.two_dim_2(self.Ksi_2, i))
 
-        print("Ksi")
-        for i in self.derivativeKsi:
-            print(i)
+        # print("Ksi")
+        # for i in self.derivativeKsi:
+        #     print(i)
 
         self.derivativeEta = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
 
@@ -119,15 +119,15 @@ class Element4_2D:
             for x in range(4):
                 self.derivativeEta[z][x] = output2[x][z]
 
-        print("Eta")
-        for i in self.derivativeEta:
-            print(i)
+        # print("Eta")
+        # for i in self.derivativeEta:
+        #     print(i)
 
     def calculate_3(self):
 
         for i in range(4):
             for j in range(9):
-                self.N_values_3[i, j] = self.functions_hbc[j](self.Ksi_3[i][j], self.Eta_3[i][j])
+                self.N_values_3[i, j] = self.functions_hbc[i](self.Ksi_3[j], self.Eta_3[j])
 
         output = []
         for i in self.functions:
@@ -140,9 +140,9 @@ class Element4_2D:
             for x in range(4):
                 self.derivativeKsi[z][x] = output[x][z]
 
-        print("Ksi")
-        for i in self.derivativeKsi:
-            print(i)
+        # print("Ksi")
+        # for i in self.derivativeKsi:
+        #     print(i)
 
         output2 = []
         for i in self.functions2:
@@ -156,17 +156,17 @@ class Element4_2D:
             for x in range(4):
                 self.derivativeEta[z][x] = output2[x][z]
 
-        print("Eta")
-        for i in self.derivativeEta:
-            print(i)
+        # print("Eta")
+        # for i in self.derivativeEta:
+        #     print(i)
 
     def calculate_temp_matrix_for_hbc_2(self):
         for i in range(4):
             for j in range(4):
                 for k in range(2):
                     self.temp_matrix_for_hbc[i, k, j] = self.functions_hbc[j](self.Ksi_wall_points_2_list[i][k], self.Eta_wall_points_2_list[i][k])
-            print("element ", i)
-            print(self.temp_matrix_for_hbc[i])
+            # print("element ", i)
+            # print(self.temp_matrix_for_hbc[i])
 
 
     def calculate_temp_matrix_for_hbc_3(self):
@@ -174,5 +174,5 @@ class Element4_2D:
             for j in range(4):
                 for k in range(3):
                     self.temp_matrix_for_hbc[i, k, j] = self.functions_hbc[j](self.Ksi_wall_points_3_list[i][k], self.Eta_wall_points_3_list[i][k])
-            print("element ", i)
-            print(self.temp_matrix_for_hbc[i])
+            # print("element ", i)
+            # print(self.temp_matrix_for_hbc[i])

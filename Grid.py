@@ -20,7 +20,7 @@ class Grid:
         self.H = H
         self.B = B
         self.nN = self.nH * self.nB  # łączna liczba węzłów = liczba w pionie x liczba w poziomie
-        self.nodes_list = np.zeros((self.nN))
+        self.nodes_list = [Node]*self.nN
         self.global_H_matrix = np.zeros((self.nN, self.nN))
         self.global_C_matrix = np.zeros((self.nN, self.nN))
         self.global_P_matrix = np.zeros((self.nN))
@@ -42,6 +42,7 @@ class Grid:
 
     def generate_elements(self):
 
+        k = 0
         for i in range(self.nB-1):      # iteracja po wierszu
             for j in range(self.nH-1):      # iteracja po kolumnie
                 bc0, bc1, bc2, bc3 = False, False, False, False     # pomocnicze zmienne do określania warunku brzegowego
@@ -68,12 +69,6 @@ class Grid:
                 node_3 = Node(self.temp_x + self.stepX, self.temp_y + self.stepY, bc2, self.init_temp)
                 node_4 = Node(self.temp_x, self.temp_y + self.stepY, bc3, self.init_temp)
 
-                self.nodes_list[i] = node_1
-                self.nodes_list[i + self.nH + 1] = node_2
-                self.nodes_list[i + self.nH + 2] = node_3
-                self.nodes_list[i + 1] = node_4
-
-
                 #tworzenie nowego elementu z odpowiednimi zmiennymi
                 el_obj = Element(self.temp_id,
                                  self.temp_id + self.nH,
@@ -89,10 +84,18 @@ class Grid:
                 self.temp_y = self.temp_y + self.stepY
                 self.temp_id = self.temp_id + 1
 
+                k = k + 1
+
             #zerowanie y (nowa kolumna), inkrementacja x oraz zwiększenie id
             self.temp_y = 0
             self.temp_x = self.temp_x + self.stepX
             self.temp_id = self.temp_id + 1
+
+        for i in self.elements:
+            self.nodes_list[i.ID[0] - 1] = i.nodes[0]
+            self.nodes_list[i.ID[1] - 1] = i.nodes[1]
+            self.nodes_list[i.ID[2] - 1] = i.nodes[2]
+            self.nodes_list[i.ID[3] - 1] = i.nodes[3]
 
     #wypisanie siatki na ekran
     def print_grid(self):
@@ -145,11 +148,11 @@ class Grid:
                 print(i.p_vect)
                 j = j + 1
 
-        k = 0
-        for i in self.elements:
-            print("element ", k)
-            print(i.hbc_matrix)
-            k = k + 1
+        # k = 0
+        # for i in self.elements:
+        #     print("element ", k)
+        #     print(i.hbc_matrix)
+        #     k = k + 1
 
 
     def calculate_hbc_matrixes_for_elements_3(self, hbc_matrix, cond):
@@ -178,15 +181,15 @@ class Grid:
 
                 i.hbc_matrix = temp_hbc_matrix[0] + temp_hbc_matrix[1] + temp_hbc_matrix[2] + temp_hbc_matrix[3]
                 i.p_vect = temp_vect_P[0] + temp_vect_P[1] + temp_vect_P[2] + temp_vect_P[3]
-                print("gowno")
-                print(i.p_vect)
+
+                #(i.p_vect)
                 j = j + 1
 
-        k = 0
-        for i in self.elements:
-            print("element ", k)
-            print(i.hbc_matrix)
-            k = k + 1
+        # k = 0
+        # for i in self.elements:
+        #     print("element ", k)
+        #     print(i.hbc_matrix)
+        #     k = k + 1
 
 
     def aggregation(self):
@@ -200,17 +203,66 @@ class Grid:
 
         for i in range(self.nN):
             for j in range(self.nN):
-                self.global_H_matrix[i, j] = self.global_H_matrix[i, j] + self.global_C_matrix[i, j]/self.time_step
-                self.global_P_matrix[i] = self.global_P_matrix[i] + (self.global_C_matrix[i, j]/self.time_step)*self.nodes_list[i]
+                self.global_H_matrix[i, j] = self.global_H_matrix[i, j] + self.global_C_matrix[i, j] / self.time_step
 
-        for l in self.global_H_matrix:
-            print(l)
+    def calculate_p_and_h_matrixes(self):
 
-        for m in self.global_P_matrix:
-            print(m)
+        vector = np.zeros((self.nN))
 
-        for n in self.global_C_matrix:
-            print(n)
+        for i in range(len(self.global_P_matrix)):
+            vector[i] = self.global_P_matrix[i]
+
+        for i in range(self.nN):
+            for j in range(self.nN):
+                vector[i] = vector[i] + (self.global_C_matrix[i, j]/self.time_step)*self.nodes_list[j].init_temp
+
+        temp_vector = np.linalg.solve(self.global_H_matrix, vector)
+
+        for o in range(len(temp_vector)):
+            self.nodes_list[o].init_temp = temp_vector[o]
+
+        print("Maksymalna temperatura : ", np.amax(temp_vector), "Minimalna tempareatura : ",
+              np.amin(temp_vector))
+
+    def equationSolve(self, a, b):
+
+        num = len(a)
+        n = np.empty(num)
+        x1 = np.empty(num)
+        x2 = np.empty(num)
+        M = np.empty((num, num))
+
+        i = 0
+        while i < num:
+            n[i] = 1 / a[i][i]
+            i += 1
+
+        # Calculate M = -D^-1 (L + U)
+        i = 0
+        while i < num:
+            j = 0
+            while j < num:
+                if i == j:
+                    M[i][j] = 0
+                else:
+                    M[i][j] = -(a[i][j] * n[i])
+                j += 1
+            i += 1
+
+        for k in range(0, 100):
+            i = 0
+            while i < num:
+                x2[i] = n[i] * b[i]
+                j = 0
+                while j < num:
+                    x2[i] += M[i][j] * x1[j]
+                    j += 1
+                i += 1
+            i = 0
+            while i < num:
+                x1[i] = x2[i]
+                i += 1
+        return list(x1)
 
 
 

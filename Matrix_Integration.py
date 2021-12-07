@@ -20,8 +20,8 @@ class Matrix_Integration:
             for j in range(len(self.ksi_derivatives[0])):
                 dx_tab[i][j] = (self.jacobian_matrix_list[i][j][0][0] * self.ksi_derivatives[i][j]) + (self.jacobian_matrix_list[i][j][0][1] * self.eta_derivatives[i][j])
 
-        print("Tabela przejsciowa dx :")
-        print(dx_tab)
+        # print("Tabela przejsciowa dx :")
+        # print(dx_tab)
 
         return dx_tab
 
@@ -34,8 +34,8 @@ class Matrix_Integration:
             for j in range(len(self.ksi_derivatives[0])):
                 dy_tab[i][j] = (self.jacobian_matrix_list[i][j][1][0] * self.ksi_derivatives[i][j]) + (self.jacobian_matrix_list[i][j][1][1] * self.eta_derivatives[i][j])
 
-        print("Tabela przejsciowa dy :")
-        print(dy_tab)
+        # print("Tabela przejsciowa dy :")
+        # print(dy_tab)
 
         return dy_tab
 
@@ -56,11 +56,11 @@ class Matrix_Integration:
             temp_matrix_y_transposed = temp_matrix_y.transpose()
             H_pc_list[i] = self.cond*(np.outer(temp_matrix_x, temp_matrix_x_transposed) + np.outer(temp_matrix_y, temp_matrix_y_transposed))*y
 
-        z = 1
-        for x in H_pc_list:
-            print("[H]Pc", z)
-            z = z + 1
-            print(np.round(x, 2))
+        # z = 1
+        # for x in H_pc_list:
+        #     print("[H]Pc", z)
+        #     z = z + 1
+        #     print(np.round(x, 2))
 
         print("Macierz H: ")
         H = H_pc_list[0] + H_pc_list[1] + H_pc_list[2] + H_pc_list[3]
@@ -82,11 +82,11 @@ class Matrix_Integration:
             temp_N_Values = np.matrix(self.N_values[i])
             C_pc_list[i] = self.c * self.ro * (np.outer(temp_N_Values, temp_N_Values.transpose())) * det_J
 
-        z = 1
-        for x in C_pc_list:
-            print("[C]Pc", z)
-            z = z + 1
-            print(np.round(x, 2))
+        # z = 1
+        # for x in C_pc_list:
+        #     print("[C]Pc", z)
+        #     z = z + 1
+        #     print(np.round(x, 2))
 
         print("Macierz C: ")
         C = C_pc_list[0] + C_pc_list[1] + C_pc_list[2] + C_pc_list[3]
