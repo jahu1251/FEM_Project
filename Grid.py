@@ -242,14 +242,17 @@ class Grid:
             i.hbc_matrix = temp_hbc_matrix[0] + temp_hbc_matrix[1] + temp_hbc_matrix[2] + temp_hbc_matrix[3]
             i.p_vector = temp_vect_p[0] + temp_vect_p[1] + temp_vect_p[2] + temp_vect_p[3]
 
-            # (i.p_vect)
             j = j + 1
 
-        # k = 0
-        # for i in self.elements:
-        #     print("element ", k)
-        #     print(i.hbc_matrix)
-        #     k = k + 1
+        k = 0
+        for i in self.elements:
+            print("element ", k, "macierz HBC : ")
+            print(i.hbc_matrix)
+            k = k + 1
+
+            print("element ", k, "wektor P : ")
+            print(i.p_vector)
+            k = k + 1
 
     # agregacja macierzy H oraz wektora P
     def aggregation(self):

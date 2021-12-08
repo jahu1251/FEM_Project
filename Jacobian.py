@@ -3,8 +3,6 @@ import numpy as np
 
 class Jacobian:
 
-    rigid_values = [[0, 0.025, 0.025, 0], [0, 0, 0.025, 0.025]]
-
     def __init__(self, ksi_der, eta_der, _elements):
         self.ksi_derivatives = np.array(ksi_der)
         self.eta_derivatives = np.array(eta_der)
@@ -15,14 +13,6 @@ class Jacobian:
         self.jacobian_matrix_list = np.zeros((x, 2, 2))
 
         self.elements = _elements
-
-    @staticmethod
-    def calculate_matrix_cell_rigid(derivatives, rigid_values):
-        result = 0
-        for i in range(len(derivatives)):
-            result = result + (derivatives[i] * rigid_values[i])
-
-        return result
 
     @staticmethod
     def calculate_matrix_cell_x(derivatives, values):
@@ -37,25 +27,6 @@ class Jacobian:
         for i in range(len(derivatives)):
             result_y = result_y + (derivatives[i] * values[i].y)
         return result_y
-
-    def calc_jacobian_rigid(self):
-
-        for i in range(len(self.auxiliary_matrix_list)):
-            self.auxiliary_matrix_list[i][0][0] = self.calculate_matrix_cell_rigid(self.eta_derivatives[i], self.rigid_values[1])
-            self.auxiliary_matrix_list[i][1][1] = self.calculate_matrix_cell_rigid(self.ksi_derivatives[i], self.rigid_values[0])
-
-        j = 0
-        for i in self.auxiliary_matrix_list:
-            # print(i)
-            determinant = 1/np.linalg.det(i)
-            self.jacobian_matrix_list[j] = i * determinant
-            j = j + 1
-
-        # print("Pochodne po x i pochodne po y dla sztynego przykladu :")
-        # for i in self.jacobian_matrix_list:
-        #     print(i)
-
-        return self.jacobian_matrix_list
 
     def calc_jacobian(self, nodes):
 

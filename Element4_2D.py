@@ -73,7 +73,7 @@ class Element4_2D:
     #tablice do przechowywania wektora p, oraz wartości funkcji kształtu
     p_vector = np.zeros((4, 4))
     N_values = np.zeros((4, 4))
-    N_values_3 = np.zeros((4, 9))
+    N_values_3 = np.zeros((9, 4))
 
     def __init__(self, cond, integration_points, c, ro):
         self.cond = cond
@@ -130,7 +130,7 @@ class Element4_2D:
 
         for i in range(4):
             for j in range(9):
-                self.N_values_3[i, j] = self.functions_hbc[i](self.Ksi_3[j], self.Eta_3[j])
+                self.N_values_3[j, i] = self.functions_hbc[i](self.Ksi_3[j], self.Eta_3[j])
 
         output = []
         for i in self.functions:
@@ -173,5 +173,5 @@ class Element4_2D:
             for j in range(4):
                 for k in range(3):
                     self.temp_matrix_for_hbc[i, k, j] = self.functions_hbc[j](self.Ksi_wall_points_3_list[i][k], self.Eta_wall_points_3_list[i][k])
-            # print("element ", i)
-            # print(self.temp_matrix_for_hbc[i])
+            print("gowno", i)
+            print(self.temp_matrix_for_hbc[i])

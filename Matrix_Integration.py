@@ -43,11 +43,32 @@ class Matrix_Integration:
 
         y = 1/np.linalg.det(jacobian)
 
-        h_pc1 = np.zeros((4, 4))
-        h_pc2 = np.zeros((4, 4))
-        h_pc3 = np.zeros((4, 4))
-        h_pc4 = np.zeros((4, 4))
-        h_pc_list = [h_pc1, h_pc2, h_pc3, h_pc4]
+        h_pc_list = np.zeros((4, 4, 4))
+
+        for i in range(4):
+            temp_matrix_x = np.matrix(dx_tab[i])
+            temp_matrix_y = np.matrix(dy_tab[i])
+            temp_matrix_x_transposed = temp_matrix_x.transpose()
+            temp_matrix_y_transposed = temp_matrix_y.transpose()
+            h_pc_list[i] = self.cond*(np.outer(temp_matrix_x, temp_matrix_x_transposed) + np.outer(temp_matrix_y, temp_matrix_y_transposed))*y
+
+        # z = 1
+        # for x in H_pc_list:
+        #     print("[H]Pc", z)
+        #     z = z + 1
+        #     print(np.round(x, 2))
+
+        print("Macierz H: ")
+        h = h_pc_list[0] + h_pc_list[1] + h_pc_list[2] + h_pc_list[3]
+        print(np.round(h, 2))
+
+        return h
+
+    def calculate_matrix_h_for_element_3(self, dx_tab, dy_tab, jacobian):
+
+        y = 1/np.linalg.det(jacobian)
+
+        h_pc_list = np.zeros((9, 4, 4))
 
         for i in range(4):
             temp_matrix_x = np.matrix(dx_tab[i])
@@ -72,13 +93,31 @@ class Matrix_Integration:
 
         det_j = 1/np.linalg.det(jacobian)
 
-        c_pc1 = np.zeros((4, 4))
-        c_pc2 = np.zeros((4, 4))
-        c_pc3 = np.zeros((4, 4))
-        c_pc4 = np.zeros((4, 4))
-        c_pc_list = [c_pc1, c_pc2, c_pc3, c_pc4]
+        c_pc_list = np.zeros((4, 4, 4))
 
         for i in range(4):
+            temp_N_Values = np.matrix(self.N_values[i])
+            c_pc_list[i] = self.c * self.ro * (np.outer(temp_N_Values, temp_N_Values.transpose())) * det_j
+
+        # z = 1
+        # for x in C_pc_list:
+        #     print("[C]Pc", z)
+        #     z = z + 1
+        #     print(np.round(x, 2))
+
+        print("Macierz C: ")
+        c = c_pc_list[0] + c_pc_list[1] + c_pc_list[2] + c_pc_list[3]
+        print(np.round(c, 2))
+
+        return c
+
+    def calculate_matrix_c_for_element_3(self, jacobian):
+
+        det_j = 1/np.linalg.det(jacobian)
+
+        c_pc_list = np.zeros((9, 4, 4))
+
+        for i in range(9):
             temp_N_Values = np.matrix(self.N_values[i])
             c_pc_list[i] = self.c * self.ro * (np.outer(temp_N_Values, temp_N_Values.transpose())) * det_j
 
@@ -106,6 +145,24 @@ class Matrix_Integration:
             temp_dy_table = self.calculate_temp_table_dy()
             global_h_matrix_list[i] = self.calculate_matrix_h_for_element(temp_dx_table, temp_dy_table, self.jacobian_matrix_list[i])
             global_c_matrix_list[i] = self.calculate_matrix_c_for_element(self.jacobian_matrix_list[i])
+            print(global_h_matrix_list[i])
+            print(global_c_matrix_list[i])
+
+        self.global_h_matrix_list = global_h_matrix_list
+        self.global_c_matrix_list = global_c_matrix_list
+
+    def calculate_H_matrixes_for_grid_3(self):
+
+        global_h_matrix_list = np.zeros((len(self.jacobian_matrix_list), 4, 4))
+        global_c_matrix_list = np.zeros((len(self.jacobian_matrix_list), 4, 4))
+
+        for i in range(len(self.jacobian_matrix_list)):
+
+            print("=========================== element", i, "=================================")
+            temp_dx_table = self.calculate_temp_table_dx()
+            temp_dy_table = self.calculate_temp_table_dy()
+            global_h_matrix_list[i] = self.calculate_matrix_h_for_element_3(temp_dx_table, temp_dy_table, self.jacobian_matrix_list[i])
+            global_c_matrix_list[i] = self.calculate_matrix_c_for_element_3(self.jacobian_matrix_list[i])
             print(global_h_matrix_list[i])
             print(global_c_matrix_list[i])
 

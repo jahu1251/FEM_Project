@@ -6,7 +6,7 @@ from Matrix_Integration import Matrix_Integration
 
 def main():
 
-    simulate(4, 4, 0.1, 0.1, 3, 25, 1200, 700, 7800, 300, 50, 100, 500)
+    simulate(4, 4, 0.1, 0.1, 2, 25, 1200, 700, 7800, 300, 50, 100, 500)
 
 
 def simulate(nH, nB, H, B, integ_points_num, cond, temp, c, ro, alfa, time_step, init_temp, simulation_time):
@@ -32,11 +32,18 @@ def simulate(nH, nB, H, B, integ_points_num, cond, temp, c, ro, alfa, time_step,
 
     jacobian_obj = Jacobian(universal_element_obj.derivativeKsi, universal_element_obj.derivativeEta, grid_obj.elements)
 
-    matrix_integration_obj = Matrix_Integration(universal_element_obj.derivativeKsi,
-                                                universal_element_obj.derivativeEta,
-                                                jacobian_obj.calculate_grid_jacobians(), cond, c, ro,
-                                                universal_element_obj.N_values)
-    matrix_integration_obj.calculate_H_matrixes_for_grid()
+    if integ_points_num == 2:
+        matrix_integration_obj = Matrix_Integration(universal_element_obj.derivativeKsi,
+                                                    universal_element_obj.derivativeEta,
+                                                    jacobian_obj.calculate_grid_jacobians(), cond, c, ro,
+                                                    universal_element_obj.N_values)
+        matrix_integration_obj.calculate_H_matrixes_for_grid()
+    elif integ_points_num == 3:
+        matrix_integration_obj = Matrix_Integration(universal_element_obj.derivativeKsi,
+                                                    universal_element_obj.derivativeEta,
+                                                    jacobian_obj.calculate_grid_jacobians(), cond, c, ro,
+                                                    universal_element_obj.N_values_3)
+        matrix_integration_obj.calculate_H_matrixes_for_grid_3()
 
     grid_obj.add_h_matrixes_to_elements(matrix_integration_obj.global_h_matrix_list)
     grid_obj.add_c_matrixes_to_elements(matrix_integration_obj.global_c_matrix_list)
