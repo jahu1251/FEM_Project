@@ -51,11 +51,9 @@ def simulate(nH, nB, H, B, integ_points_num, cond, temp, c, ro, alfa, time_step,
     current_time = 0
 
     while current_time < simulation_time:
-        print("czas : ", current_time)
+        print("Czas : ", current_time)
         grid_obj.calculate_p_and_h_matrixes()
         current_time += time_step
-
-    #grid_obj.calculate_p_and_h_matrixes(time_step)
 
 
 if __name__ == "__main__":

@@ -28,17 +28,17 @@ class Element4_2D:
     def N4_hbc(x, y):
         return 0.25 * (1. - x) * (1. + y)
 
-    #devariatives things
+    # punkty całkowania dla 2 i 3 punktowego schematu
     Ksi_2 = [-(1 / math.sqrt(3)), (1 / math.sqrt(3)), (1 / math.sqrt(3)), -(1 / math.sqrt(3))]
     Eta_2 = [-(1 / math.sqrt(3)), -(1 / math.sqrt(3)), (1 / math.sqrt(3)), (1 / math.sqrt(3))]
-    Ksi_3 = [-(math.sqrt(3/5)), 0, (math.sqrt(3/5)), -(math.sqrt(3/5)), 0, math.sqrt(3/5), -(math.sqrt(3/5)), 0, math.sqrt(3/5)]
-    Eta_3 = [-(math.sqrt(3/5)), -(math.sqrt(3/5)), -(math.sqrt(3/5)), 0, 0, 0, math.sqrt(3/5), math.sqrt(3/5), math.sqrt(3/5)]
-    functions = [N1, N2, N3, N4]
-    functions2 = [N1, N4, N3, N2]
+    Ksi_3 = [-(math.sqrt(3 / 5)), 0, (math.sqrt(3 / 5)), -(math.sqrt(3 / 5)), 0, math.sqrt(3 / 5), -(math.sqrt(3 / 5)), 0, math.sqrt(3 / 5)]
+    Eta_3 = [-(math.sqrt(3 / 5)), -(math.sqrt(3 / 5)), -(math.sqrt(3 / 5)), 0, 0, 0, math.sqrt(3 / 5), math.sqrt(3 / 5), math.sqrt(3 / 5)]
+    functions = np.array([N1, N2, N3, N4])
+    functions2 = np.array([N1, N4, N3, N2])
     derivativeKsi = []
     derivativeEta = []
 
-    #hbc things
+    # punkty całkowania na ścianach
     Ksi_2_wall_points_1 = [-(1 / math.sqrt(3)), (1 / math.sqrt(3))]
     Ksi_2_wall_points_2 = [1, 1]
     Ksi_2_wall_points_3 = [(1 / math.sqrt(3)), -(1 / math.sqrt(3))]
@@ -59,37 +59,40 @@ class Element4_2D:
     Eta_3_wall_points_3 = [1, 1, 1]
     Eta_3_wall_points_4 = [(math.sqrt(3 / 5)), 0, -(math.sqrt(3 / 5))]
 
-    functions_hbc = [N1_hbc, N2_hbc, N3_hbc, N4_hbc]
-    point_weights_3 = [5/9, 8/9, 5/9, 5/9, 8/9, 5/9, 5/9, 8/9, 5/9, 5/9, 8/9, 5/9]
+    # funkcje kształtu (x, y)
+    functions_hbc = np.array([N1_hbc, N2_hbc, N3_hbc, N4_hbc])
+    point_weights_3 = np.array([5 / 9, 8 / 9, 5 / 9, 5 / 9, 8 / 9, 5 / 9, 5 / 9, 8 / 9, 5 / 9, 5 / 9, 8 / 9, 5 / 9])
     walls_hbc = np.zeros((4, 4, 4))
 
+    # listy z punktami całkowania na elementach
     Ksi_wall_points_2_list = [Ksi_2_wall_points_1, Ksi_2_wall_points_2, Ksi_2_wall_points_3, Ksi_2_wall_points_4]
     Eta_wall_points_2_list = [Eta_2_wall_points_1, Eta_2_wall_points_2, Eta_2_wall_points_3, Eta_2_wall_points_4]
-
     Ksi_wall_points_3_list = [Ksi_3_wall_points_1, Ksi_3_wall_points_2, Ksi_3_wall_points_3, Ksi_3_wall_points_4]
     Eta_wall_points_3_list = [Eta_3_wall_points_1, Eta_3_wall_points_2, Eta_3_wall_points_3, Eta_3_wall_points_4]
 
-    p_vect = np.zeros((4,4))
-
+    #tablice do przechowywania wektora p, oraz wartości funkcji kształtu
+    p_vector = np.zeros((4, 4))
     N_values = np.zeros((4, 4))
     N_values_3 = np.zeros((4, 9))
 
-    def __init__(self, cond, integ_points, c, ro):
+    def __init__(self, cond, integration_points, c, ro):
         self.cond = cond
         self.ro = ro
         self.c = c
 
-        if integ_points == 2:
+        if integration_points == 2:
             self.temp_matrix_for_hbc = np.zeros((4, 2, 4))
-        if integ_points == 3:
+        if integration_points == 3:
             self.temp_matrix_for_hbc = np.zeros((4, 3, 4))
 
-    def two_dim_2(self, tab, n):
+    @staticmethod
+    def two_dim_2(tab, n):
         final = []
         for i in tab:
             final.append(n(i))
         return final
 
+    #obliczanie wartości funkcji kształtu
     def calculate_2(self):
         for i in range(4):
             for j in range(4):
@@ -99,7 +102,7 @@ class Element4_2D:
         for i in self.functions:
             output.append(self.two_dim_2(self.Eta_2, i))
 
-        self.derivativeKsi = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        self.derivativeKsi = np.zeros((4, 4))
 
         for z in range(4):
             for x in range(4):
@@ -113,7 +116,7 @@ class Element4_2D:
         # for i in self.derivativeKsi:
         #     print(i)
 
-        self.derivativeEta = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        self.derivativeEta = np.zeros((4, 4))
 
         for z in range(4):
             for x in range(4):
@@ -133,8 +136,7 @@ class Element4_2D:
         for i in self.functions:
             output.append(self.two_dim_2(self.Eta_3, i))
 
-        self.derivativeKsi = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
-                  [0, 0, 0, 0], [0, 0, 0, 0]]
+        self.derivativeKsi = np.zeros((9, 4))
 
         for z in range(9):
             for x in range(4):
@@ -148,9 +150,7 @@ class Element4_2D:
         for i in self.functions2:
             output2.append(self.two_dim_2(self.Ksi_3, i))
 
-        self.derivativeEta = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
-                              [0, 0, 0, 0],
-                              [0, 0, 0, 0], [0, 0, 0, 0]]
+        self.derivativeEta = np.zeros((9, 4))
 
         for z in range(9):
             for x in range(4):
@@ -167,7 +167,6 @@ class Element4_2D:
                     self.temp_matrix_for_hbc[i, k, j] = self.functions_hbc[j](self.Ksi_wall_points_2_list[i][k], self.Eta_wall_points_2_list[i][k])
             # print("element ", i)
             # print(self.temp_matrix_for_hbc[i])
-
 
     def calculate_temp_matrix_for_hbc_3(self):
         for i in range(4):

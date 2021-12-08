@@ -3,19 +3,11 @@ import numpy as np
 
 class Jacobian:
 
-    auxiliary_matrix_list = []
-    jacobian_matrix_list = []
-
-    ksi_derivatives = []
-    eta_derivatives = []
-
     rigid_values = [[0, 0.025, 0.025, 0], [0, 0, 0.025, 0.025]]
 
-    elements = []
-
     def __init__(self, ksi_der, eta_der, _elements):
-        self.ksi_derivatives = ksi_der
-        self.eta_derivatives = eta_der
+        self.ksi_derivatives = np.array(ksi_der)
+        self.eta_derivatives = np.array(eta_der)
 
         x = len(_elements)
 
@@ -32,13 +24,15 @@ class Jacobian:
 
         return result
 
-    def calculate_matrix_cell_x(self, derivatives, values):
+    @staticmethod
+    def calculate_matrix_cell_x(derivatives, values):
         result_x = 0.0
         for i in range(len(derivatives)):
             result_x = result_x + (derivatives[i] * values[i].x)
         return result_x
 
-    def calculate_matrix_cell_y(self, derivatives, values):
+    @staticmethod
+    def calculate_matrix_cell_y(derivatives, values):
         result_y = 0.0
         for i in range(len(derivatives)):
             result_y = result_y + (derivatives[i] * values[i].y)
@@ -56,7 +50,7 @@ class Jacobian:
             determinant = 1/np.linalg.det(i)
             self.jacobian_matrix_list[j] = i * determinant
             j = j + 1
-        #
+
         # print("Pochodne po x i pochodne po y dla sztynego przykladu :")
         # for i in self.jacobian_matrix_list:
         #     print(i)
@@ -79,7 +73,6 @@ class Jacobian:
             j = j + 1
 
         return element_matrix_list
-
 
     def calculate_grid_jacobians(self):
         jacobian_result = []

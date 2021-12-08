@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Element:
     def __init__(self, id1, id2, id3, id4, node1, node2, node3, node4):
         self.ID = []
@@ -15,4 +16,4 @@ class Element:
         self.h_matrix = np.zeros((4, 4))
         self.c_matrix = np.zeros((4, 4))
         self.hbc_matrix = np.zeros((4, 4))
-        self.p_vect = np.zeros((4))
+        self.p_vector = np.zeros(4)
