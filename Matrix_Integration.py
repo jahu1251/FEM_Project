@@ -3,15 +3,19 @@ import numpy as np
 
 class Matrix_Integration:
 
+    pw3 = np.array([5 / 9, 8 / 9, 5 / 9, 5 / 9, 8 / 9, 5 / 9, 5 / 9, 8 / 9, 5 / 9, 5 / 9, 8 / 9, 5 / 9])
+    pwm = np.array([pw3[0] * pw3[0], pw3[0] * pw3[1], pw3[1] * pw3[1]])
+    pwp = np.array([pwm[0], pwm[1], pwm[0], pwm[1], pwm[2], pwm[1], pwm[0], pwm[1], pwm[0]])
+
     def __init__(self, ksi_der, eta_der, jacobian_matrix_list, cond, c, ro, N_values):
 
-        self.ksi_derivatives = ksi_der
-        self.eta_derivatives = eta_der
-        self.jacobian_matrix_list = jacobian_matrix_list
+        self.ksi_derivatives = np.array(ksi_der)
+        self.eta_derivatives = np.array(eta_der)
+        self.jacobian_matrix_list = np.array(jacobian_matrix_list)
         self.cond = cond
         self.ro = ro
         self.c = c
-        self.N_values = N_values
+        self.N_values = np.array(N_values)
 
     def calculate_temp_table_dx(self):
 
@@ -50,7 +54,7 @@ class Matrix_Integration:
             temp_matrix_y = np.matrix(dy_tab[i])
             temp_matrix_x_transposed = temp_matrix_x.transpose()
             temp_matrix_y_transposed = temp_matrix_y.transpose()
-            h_pc_list[i] = self.cond*(np.outer(temp_matrix_x, temp_matrix_x_transposed) + np.outer(temp_matrix_y, temp_matrix_y_transposed))*y
+            h_pc_list[i] = self.cond*(np.outer(temp_matrix_x, temp_matrix_x_transposed) + np.outer(temp_matrix_y, temp_matrix_y_transposed))*y[i]
 
         # z = 1
         # for x in H_pc_list:
@@ -70,12 +74,12 @@ class Matrix_Integration:
 
         h_pc_list = np.zeros((9, 4, 4))
 
-        for i in range(4):
+        for i in range(9):
             temp_matrix_x = np.matrix(dx_tab[i])
             temp_matrix_y = np.matrix(dy_tab[i])
             temp_matrix_x_transposed = temp_matrix_x.transpose()
             temp_matrix_y_transposed = temp_matrix_y.transpose()
-            h_pc_list[i] = self.cond*(np.outer(temp_matrix_x, temp_matrix_x_transposed) + np.outer(temp_matrix_y, temp_matrix_y_transposed))*y
+            h_pc_list[i] = self.pwp[i]*(self.cond*(np.outer(temp_matrix_x, temp_matrix_x_transposed) + np.outer(temp_matrix_y, temp_matrix_y_transposed))*y[i])
 
         # z = 1
         # for x in H_pc_list:
@@ -84,7 +88,7 @@ class Matrix_Integration:
         #     print(np.round(x, 2))
 
         print("Macierz H: ")
-        h = h_pc_list[0] + h_pc_list[1] + h_pc_list[2] + h_pc_list[3]
+        h = h_pc_list[0] + h_pc_list[1] + h_pc_list[2] + h_pc_list[3]+ h_pc_list[4] + h_pc_list[5] + h_pc_list[6]+ h_pc_list[7] + h_pc_list[8]
         print(np.round(h, 2))
 
         return h
@@ -119,7 +123,7 @@ class Matrix_Integration:
 
         for i in range(9):
             temp_N_Values = np.matrix(self.N_values[i])
-            c_pc_list[i] = self.c * self.ro * (np.outer(temp_N_Values, temp_N_Values.transpose())) * det_j
+            c_pc_list[i] = self.pwp[i]*(self.c * self.ro * (np.outer(temp_N_Values, temp_N_Values.transpose())) * det_j[i])
 
         # z = 1
         # for x in C_pc_list:
@@ -128,7 +132,7 @@ class Matrix_Integration:
         #     print(np.round(x, 2))
 
         print("Macierz C: ")
-        c = c_pc_list[0] + c_pc_list[1] + c_pc_list[2] + c_pc_list[3]
+        c = c_pc_list[0] + c_pc_list[1] + c_pc_list[2] + c_pc_list[3] + c_pc_list[4] + c_pc_list[5] + c_pc_list[6]+ c_pc_list[7]+ c_pc_list[8]
         print(np.round(c, 2))
 
         return c

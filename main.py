@@ -6,7 +6,7 @@ from Matrix_Integration import Matrix_Integration
 
 def main():
 
-    simulate(4, 4, 0.1, 0.1, 2, 25, 1200, 700, 7800, 300, 50, 100, 500)
+    simulate(31, 31, 0.1, 0.1, 3, 25, 1200, 700, 7800, 300, 1, 100, 100)
 
 
 def simulate(nH, nB, H, B, integ_points_num, cond, temp, c, ro, alfa, time_step, init_temp, simulation_time):

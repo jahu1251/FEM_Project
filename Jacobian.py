@@ -30,8 +30,8 @@ class Jacobian:
 
     def calc_jacobian(self, nodes):
 
-        auxiliary_element_matrix_list = np.zeros((4, 2, 2))
-        element_matrix_list = np.zeros((4, 2, 2))
+        auxiliary_element_matrix_list = np.zeros((len(self.ksi_derivatives), 2, 2))
+        element_matrix_list = np.zeros((len(self.ksi_derivatives), 2, 2))
 
         for i in range(len(auxiliary_element_matrix_list)):
             auxiliary_element_matrix_list[i][1][1] = self.calculate_matrix_cell_x(self.ksi_derivatives[i], nodes)
