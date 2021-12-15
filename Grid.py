@@ -29,6 +29,20 @@ class Grid:
         self.calculate_parameters()
         self.generate_elements()
 
+    def __init__(self, nH, nB, nE, nN, nodes_list, id_list, temp, time_step, init_temp):
+        self.nH = nH
+        self.nB = nB
+        self.nE = nE
+        self.nN = nN
+        self.id_list = id_list
+        self.nodes_list = nodes_list  # lista pomocnicza do przechoeywania node'ów
+        self.global_H_matrix = np.zeros((self.nN, self.nN))  # globalna macierz H
+        self.global_C_matrix = np.zeros((self.nN, self.nN))  # globalna macierz C
+        self.global_P_matrix = np.zeros(self.nN)  # globalna macierz P
+        self.temp = temp  # ciepło właściwe
+        self.time_step = time_step  # krok czasowy
+        self.init_temp = init_temp  # temperatura początkowa węzłów
+
     def calculate_parameters(self):
 
         self.nE = (self.nH - 1) * (
